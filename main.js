@@ -6,6 +6,10 @@ var paddle2 =10,paddle1=10;
 var paddle1X = 10,paddle1Height = 110;
 var paddle2Y = 685,paddle2Height = 70;
 
+rightwristX = 0;
+rightwristY = 0;
+scorerightwrist = 0;
+
 var score1 = 0, score2 =0;
 var paddle1Y;
 
@@ -29,6 +33,7 @@ function setup(){
   webcam.size(700, 600);
   webcam.hide()
   poseNet = ml5.poseNet(webcam, modelLoaded);
+  poseNet.on('pose', gotPoses);
 }
 
 function modelLoaded() {
@@ -48,6 +53,12 @@ function draw(){
  stroke("black");
  rect(0,0,20,700);
  
+    if (scorerightwrist > 0.2) {
+      fill("cyan")
+      stroke("cyan")
+      circle(rightwristX, rightwristY, 30)
+    }
+
    //funtion paddleInCanvas call 
    paddleInCanvas();
  
@@ -172,4 +183,13 @@ function paddleInCanvas(){
   if(mouseY < 0){
     mouseY =0;
   }  
+}
+
+function gotPoses(results) {
+  if (results.length > 0){
+    console.log(results)
+    rightwristX = results[0].pose.rightWrist.x;
+    rightwristY = results[0].pose.rightWrist.y;
+    scorerightwrist = results[0].pose.keypoints[10].score;
+  }
 }
