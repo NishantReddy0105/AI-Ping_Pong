@@ -11,11 +11,16 @@ rightwristY = 0;
 scorerightwrist = 0;
 
 var score1 = 0, score2 =0;
-var paddle1Y;
+
 
 var  playerscore =0;
-var audio1;
+var audio1 = "";
+var audio2 = "";
 var pcscore =0;
+
+game_status = ""; 
+
+
 //ball x and y and speedx speed y and radius
 var ball = {
     x:350/2,
@@ -25,7 +30,12 @@ var ball = {
     dy:3
 }
 
-function setup(){
+function preload() {
+  audio1 = loadSound("ball_touch_paddel.wav");
+  audio2 = loadSound("missed.wav");
+}
+
+ function setup(){
 
   var canvas =  createCanvas(700,600);
   canvas.parent("canvas");  
@@ -42,16 +52,19 @@ function modelLoaded() {
 
 function draw(){
 
+  if (game_status == "start");
+
   image(webcam, 0, 0, 700, 600);
  //background(0); 
 
- fill("black");
+ fill("black");   
  stroke("black");
  rect(680,0,20,700);
 
  fill("black");
  stroke("black");
  rect(0,0,20,700);
+ 
  
     if (scorerightwrist > 0.2) {
       fill("cyan")
@@ -66,7 +79,7 @@ function draw(){
    fill(250,0,0);
     stroke(0,0,250);
     strokeWeight(0.5);
-   paddle1Y = mouseY; 
+    paddle1Y = rightwristY;
    rect(paddle1X,paddle1Y,paddle1,paddle1Height,100);
    
    
@@ -86,17 +99,21 @@ function draw(){
    
    //function move call which in very important
     move();
+
+
 }
 
 
-
+function startGame() {
+  game_status = "start";
+  document.getElementById("status").innerHTML = "Game is Loaded";
+}
 //function reset when ball does notcame in the contact of padde
 function reset(){
    ball.x = width/2+100,
    ball.y = height/2+100;
    ball.dx=3;
    ball.dy =3;
-   
 }
 
 
@@ -137,10 +154,12 @@ function move(){
    }
   if (ball.x-2.5*ball.r/2< 0){
   if (ball.y >= paddle1Y&& ball.y <= paddle1Y + paddle1Height) {
+    audio1.play();
     ball.dx = -ball.dx+0.5;
     playerscore++;
   }
   else{
+    audio2.play();
     pcscore++;
     reset();
     navigator.vibrate(100);
@@ -154,7 +173,7 @@ if(pcscore ==4){
     stroke("white");
     textSize(25)
     text("Game Over!☹☹",width/2,height/2);
-    text("Reload The Page!",width/2,height/2+30)
+    text("Press Restart to Play Again!",width/2,height/2+30)
     noLoop();
     pcscore = 0;
 }
@@ -192,4 +211,10 @@ function gotPoses(results) {
     rightwristY = results[0].pose.rightWrist.y;
     scorerightwrist = results[0].pose.keypoints[10].score;
   }
+}
+
+function restart() {
+  pcscore = 0;
+  playerscore = 0;
+  loop();
 }
